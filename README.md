@@ -120,7 +120,14 @@ Chapter 2 includes a physical icebreaker ("Pass the Part") that needs a little p
 
 - **Attendees** — open the link, follow along, revisit later in Explore mode.
 - **Facilitators / presenters** — read **[PRESENTING.md](PRESENTING.md)** first.
-- **Administrators** — run it in Advanced mode (<kbd>A</kbd>) for the configuration chapter.
+- **Administrators** — run it in Advanced mode (<kbd>A</kbd>) for the configuration chapter, then move on to the Advanced module below.
+
+## The bootcamp series
+
+| Module | Audience | Link |
+|---|---|---|
+| **Fundamentals** *(this one)* | Everyone. Start here | [Open](https://yjyoo122.github.io/plm-bootcamp-fundamentals/) |
+| **Advanced** | Administrators, implementers. Hands-on build session — needs your own tenant | [Open](https://yjyoo122.github.io/plm-bootcamp-advanced/) · [Repo](https://github.com/yjyoo122/plm-bootcamp-advanced) |
 
 ## Sharing it
 

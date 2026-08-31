@@ -1,9 +1,12 @@
 <#
   Publish a new version of the PLM Bootcamp deck to GitHub Pages.
 
+  Publishes the FUNDAMENTALS deck only. The Advanced deck lives in its own
+  repo folder (plm-bootcamp-advanced) with its own copy of this script.
+
   Usage:
-    Double-click  "Publish deck.bat"           -> picks the newest .html in the source folder
-    Drag an .html file onto "Publish deck.bat" -> publishes that specific file
+    Double-click  "Publish deck.bat"           -> publishes "PLM Technical Bootcamp - Fundamentals.html"
+    Drag an .html file onto "Publish deck.bat" -> publishes that specific file instead
     .\publish.ps1 -SourceFile "C:\path\to\deck.html" -Message "Added Quality chapter"
 
   What it does, in order:
@@ -17,7 +20,8 @@
 param(
     [string]$SourceFile = "",
     [string]$Message    = "",
-    [string]$SourceDir  = "C:\Users\yooy\OneDrive - Autodesk\Fusion Manage\Enablement materials\PLM BOOTCAMP"
+    [string]$SourceDir  = "C:\Users\yooy\OneDrive - Autodesk\Fusion Manage\Enablement materials\PLM BOOTCAMP",
+    [string]$SourceName = "PLM Technical Bootcamp - Fundamentals.html"
 )
 
 $ErrorActionPreference = 'Stop'
@@ -42,12 +46,14 @@ if ([string]::IsNullOrWhiteSpace($SourceFile)) {
     if (-not (Test-Path $SourceDir)) {
         Die "Source folder not found:`n        $SourceDir`n`n        Drag the .html file onto 'Publish deck.bat' instead."
     }
-    $candidate = Get-ChildItem -Path $SourceDir -Filter *.html -File |
-                 Sort-Object LastWriteTime -Descending |
-                 Select-Object -First 1
-    if ($null -eq $candidate) { Die "No .html file found in:`n        $SourceDir" }
-    $SourceFile = $candidate.FullName
-    Say "Source (newest in folder):"
+    # Pinned to one filename on purpose. Picking "newest .html in the folder" would
+    # publish the Advanced deck over this site the moment that file was updated.
+    $pinned = Join-Path $SourceDir $SourceName
+    if (-not (Test-Path -LiteralPath $pinned)) {
+        Die "Expected deck file not found:`n        $pinned`n`n        If it was renamed, drag the new file onto 'Publish deck.bat',`n        or update the SourceName line at the top of publish.ps1."
+    }
+    $SourceFile = $pinned
+    Say "Source (the Fundamentals deck):"
 } else {
     Say "Source (you chose):"
 }
