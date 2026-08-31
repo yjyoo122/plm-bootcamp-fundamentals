@@ -68,6 +68,9 @@ Say "  $($src.Name)"
 Say "  $srcMiB MiB, modified $($src.LastWriteTime.ToString('yyyy-MM-dd HH:mm'))"
 Say ""
 
+if ($src.Name -like '*Advanced*') {
+    Die "That is the ADVANCED deck. This repo publishes the Fundamentals module.`n`n        Publish Advanced from: C:\Users\yooy\plm-bootcamp-advanced"
+}
 if ($src.Length -lt 100KB) { Warn "That file is unusually small for this deck. Double-check it is the right one." }
 if ($src.Length -gt 100MB) { Die  "File is over 100 MiB. GitHub blocks files that large. Reduce the embedded images." }
 if ($src.Length -gt 25MB)  { Warn "Over 25 MiB - too big for GitHub's browser upload. This script still works (it uses git)." }
