@@ -4,7 +4,7 @@ An interactive training deck for Autodesk **Fusion Manage** (PLM), built to be r
 
 ## ▶ Open the training
 
-### **https://yjyoo122.github.io/plm-bootcamp/**
+### **https://yjyoo122.github.io/plm-bootcamp-fundamentals/**
 
 That's it. No install, no login, no download. Click the link and it runs in your browser.
 
@@ -37,7 +37,7 @@ Two links *inside* the content do need internet when clicked: the Autodesk Help 
 
 Recommended if you're presenting somewhere with unreliable wifi.
 
-1. Download the file: **[index.html](https://raw.githubusercontent.com/yjyoo122/plm-bootcamp/main/index.html)** (right-click → Save link as…, ~18 MB)
+1. Download the file: **[index.html](https://raw.githubusercontent.com/yjyoo122/plm-bootcamp-fundamentals/main/index.html)** (right-click → Save link as…, ~18 MB)
 2. Double-click the saved file. It opens in your default browser and runs identically.
 
 No web server needed — `file://` works fine.
@@ -148,7 +148,7 @@ All content lives in a single `DECK` array inside `index.html`. Structure, styli
 Publishing an update:
 
 ```bash
-cd plm-bootcamp
+cd plm-bootcamp-fundamentals
 # replace index.html with the new build
 git commit -am "Update bootcamp deck"
 git push

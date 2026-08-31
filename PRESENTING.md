@@ -15,7 +15,7 @@ Press <kbd>S</kbd> (or click **Notes**) to bring them up. Read the notes for a c
 
 **Test the display.** Open the link, press <kbd>F</kbd> for fullscreen, confirm it fills the projector at 16:9.
 
-**Take an offline copy as insurance.** Download [index.html](https://raw.githubusercontent.com/yjyoo122/plm-bootcamp/main/index.html) to your laptop and confirm it opens by double-clicking. If the venue wifi fails, you present from the local file and lose nothing.
+**Take an offline copy as insurance.** Download [index.html](https://raw.githubusercontent.com/yjyoo122/plm-bootcamp-fundamentals/main/index.html) to your laptop and confirm it opens by double-clicking. If the venue wifi fails, you present from the local file and lose nothing.
 
 **Decide Basic or Advanced.** Press <kbd>A</kbd> to toggle. Advanced appends the admin chapter (workspace anatomy, relationships, workflow editor, scripting). Use it for administrators and implementers; leave it off for end users.
 
@@ -66,7 +66,7 @@ The deck's note on this is blunt and worth repeating: learn this in the room and
 
 ## After the session
 
-Send attendees the link: **https://yjyoo122.github.io/plm-bootcamp/** — tell them to press <kbd>P</kbd> for Explore mode so they get a scrollable document rather than a slideshow.
+Send attendees the link: **https://yjyoo122.github.io/plm-bootcamp-fundamentals/** — tell them to press <kbd>P</kbd> for Explore mode so they get a scrollable document rather than a slideshow.
 
 The final chapter has a feedback form. Ask for it in the room while people are still sitting down; response rates collapse once they leave.
 
