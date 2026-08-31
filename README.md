@@ -145,7 +145,20 @@ All content lives in a single `DECK` array inside `index.html`. Structure, styli
 - **Images** are base64 data URIs in the image registry, keyed by short name (e.g. `logo`, `yj`).
 - Styling follows the Autodesk Brand Hub palette — see the comment at the top of the `<style>` block.
 
-Publishing an update:
+### Publishing a new version
+
+This deck is a live document — update it as often as you like.
+
+**Easiest way.** In the repo folder, either:
+
+- **Double-click `Publish deck.bat`** — publishes the newest `.html` from the OneDrive bootcamp folder, or
+- **Drag any `.html` file onto `Publish deck.bat`** — publishes that specific file
+
+The script copies the file over `index.html`, re-applies the "PLM Bootcamp - Fundamentals" title, commits, and pushes. It reports what it did and stops with an explanation if anything looks wrong.
+
+**Why not just copy the file yourself:** a fresh export from source carries the original `PLM Technical Bootcamp` title. The script re-applies the current title on every publish so it can't silently revert. To change the title permanently, edit the two lines near the top of `publish.ps1`.
+
+**Manually, if you prefer git:**
 
 ```bash
 cd plm-bootcamp-fundamentals
@@ -154,7 +167,14 @@ git commit -am "Update bootcamp deck"
 git push
 ```
 
-GitHub Pages rebuilds in about a minute. Note that each revision stores a full ~18 MB copy, so the repository grows with every update.
+**Or with no tools at all:** on the repo page, open `index.html` → pencil icon → delete-and-upload, or drag the new file into the repo. Works only while the deck stays **under 25 MiB** — that's GitHub's browser upload limit, and the deck is currently 17.5 MiB.
+
+### Things to know about updating
+
+- **Pages rebuilds in about a minute** after a push.
+- **Browsers cache the page for 10 minutes** (`Cache-Control: max-age=600`). If you still see the old version, hard-reload with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd>. Attendees mid-session are unaffected — they already have the file loaded.
+- **Every revision stores a full ~18 MB copy.** GitHub recommends repositories stay under 1 GB, so budget roughly **55 updates** before the history needs squashing. The publish script warns you as you approach it.
+- **Don't rename the repository.** It changes the Pages URL and breaks every link you've shared — `github.io` paths do not redirect. The deck title is independent of the repo name.
 
 </details>
 

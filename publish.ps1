@@ -119,17 +119,16 @@ try {
     if (-not $?) { Die "git push failed. Check your internet connection, then run this again." }
     Good "Pushed to GitHub"
 
-    $sizeLine = git count-objects -vH | Select-String '^size-pack:'
-    if ($null -ne $sizeLine) {
-        $repoSize = ($sizeLine -split ':')[1].Trim()
-        $revs = (git rev-list --count HEAD)
-        Say ""
-        Say "Repository: $repoSize across $revs revisions"
-        $packMiB = [math]::Round(((Get-ChildItem "$RepoDir\.git" -Recurse -File -ErrorAction SilentlyContinue |
-                    Measure-Object -Property Length -Sum).Sum / 1MB), 0)
-        if ($packMiB -gt 700) {
-            Warn "Approaching GitHub's recommended 1 GB limit. Ask about squashing old revisions."
-        }
+    $gitMiB = [math]::Round(((Get-ChildItem "$RepoDir\.git" -Recurse -File -ErrorAction SilentlyContinue |
+                Measure-Object -Property Length -Sum).Sum / 1MB), 0)
+    $revs = git rev-list --count HEAD
+    Say ""
+    Say "History: $revs revisions, $gitMiB MiB stored"
+    if ($gitMiB -gt 700) {
+        Warn "Approaching GitHub's recommended 1 GB limit. Time to squash old revisions."
+    } elseif ($gitMiB -gt 300) {
+        $headroom = [math]::Round((1024 - $gitMiB) / 18)
+        Say "  (GitHub recommends under 1024 MiB - roughly $headroom more updates of headroom.)"
     }
 }
 finally { Pop-Location }
