@@ -1,0 +1,145 @@
+<#
+  Publish a new version of the PLM Bootcamp deck to GitHub Pages.
+
+  Usage:
+    Double-click  "Publish deck.bat"           -> picks the newest .html in the source folder
+    Drag an .html file onto "Publish deck.bat" -> publishes that specific file
+    .\publish.ps1 -SourceFile "C:\path\to\deck.html" -Message "Added Quality chapter"
+
+  What it does, in order:
+    1. Finds the deck HTML to publish
+    2. Copies it over index.html, re-applying the "PLM Bootcamp - Fundamentals" title
+       (a fresh export from source would otherwise revert the title)
+    3. Commits and pushes; GitHub Pages rebuilds automatically
+#>
+
+[CmdletBinding()]
+param(
+    [string]$SourceFile = "",
+    [string]$Message    = "",
+    [string]$SourceDir  = "C:\Users\yooy\OneDrive - Autodesk\Fusion Manage\Enablement materials\PLM BOOTCAMP"
+)
+
+$ErrorActionPreference = 'Stop'
+$RepoDir  = $PSScriptRoot
+$LiveUrl  = "https://yjyoo122.github.io/plm-bootcamp-fundamentals/"
+
+# --- the title applied on every publish. Change these two lines to retitle the deck. ---
+$TabTitle     = "PLM Bootcamp - Fundamentals"
+$CoverHeading = "<h1>PLM Bootcamp<br>Fundamentals</h1>"
+
+function Say  ($m) { Write-Host $m }
+function Good ($m) { Write-Host "  OK    $m" -ForegroundColor Green }
+function Warn ($m) { Write-Host "  WARN  $m" -ForegroundColor Yellow }
+function Die  ($m) { Write-Host ""; Write-Host "  STOP  $m" -ForegroundColor Red; Write-Host ""; exit 1 }
+
+Say ""
+Say "=== Publish PLM Bootcamp deck ==="
+Say ""
+
+# ---------------------------------------------------------------- 1. find the source
+if ([string]::IsNullOrWhiteSpace($SourceFile)) {
+    if (-not (Test-Path $SourceDir)) {
+        Die "Source folder not found:`n        $SourceDir`n`n        Drag the .html file onto 'Publish deck.bat' instead."
+    }
+    $candidate = Get-ChildItem -Path $SourceDir -Filter *.html -File |
+                 Sort-Object LastWriteTime -Descending |
+                 Select-Object -First 1
+    if ($null -eq $candidate) { Die "No .html file found in:`n        $SourceDir" }
+    $SourceFile = $candidate.FullName
+    Say "Source (newest in folder):"
+} else {
+    Say "Source (you chose):"
+}
+
+if (-not (Test-Path -LiteralPath $SourceFile)) { Die "File not found: $SourceFile" }
+
+$src = Get-Item -LiteralPath $SourceFile
+if ($src.Extension -notmatch '^\.html?$') { Die "Not an HTML file: $($src.Name)" }
+
+$srcMiB = [math]::Round($src.Length / 1MB, 1)
+Say "  $($src.Name)"
+Say "  $srcMiB MiB, modified $($src.LastWriteTime.ToString('yyyy-MM-dd HH:mm'))"
+Say ""
+
+if ($src.Length -lt 100KB) { Warn "That file is unusually small for this deck. Double-check it is the right one." }
+if ($src.Length -gt 100MB) { Die  "File is over 100 MiB. GitHub blocks files that large. Reduce the embedded images." }
+if ($src.Length -gt 25MB)  { Warn "Over 25 MiB - too big for GitHub's browser upload. This script still works (it uses git)." }
+
+# ---------------------------------------------------------------- 2. copy + retitle
+$target = Join-Path $RepoDir 'index.html'
+
+$bytes = [System.IO.File]::ReadAllBytes($src.FullName)
+$html  = [System.Text.Encoding]::UTF8.GetString($bytes)
+
+$titleHits = ([regex]'<title>.*?</title>').Matches($html).Count
+$html = [regex]::Replace($html, '<title>.*?</title>', "<title>$TabTitle</title>")
+
+$coverPattern = '<h1>PLM (?:Technical<br>Bootcamp|Bootcamp<br>Fundamentals)</h1>'
+$coverHits = ([regex]$coverPattern).Matches($html).Count
+$html = [regex]::Replace($html, $coverPattern, $CoverHeading)
+
+if ($titleHits -eq 0) { Warn "No <title> tag found - browser tab title not set." }
+else                  { Good "Tab title set to '$TabTitle'" }
+
+if ($coverHits -eq 0) { Warn "Cover heading pattern not found - check the cover slide title yourself." }
+else                  { Good "Cover heading set to 'PLM Bootcamp / Fundamentals'" }
+
+# UTF8Encoding($false) = no byte-order mark, so the file stays byte-faithful
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+[System.IO.File]::WriteAllBytes($target, $utf8NoBom.GetBytes($html))
+Good "Wrote index.html"
+Say ""
+
+# ---------------------------------------------------------------- 3. commit + push
+Push-Location $RepoDir
+try {
+    $dirty = git status --porcelain
+    if ([string]::IsNullOrWhiteSpace($dirty)) {
+        Say "No changes - the published version already matches this file."
+        Say "Nothing to do. Live at:"
+        Say "  $LiveUrl"
+        Say ""
+        exit 0
+    }
+
+    if ([string]::IsNullOrWhiteSpace($Message)) {
+        $Message = "Update deck - $(Get-Date -Format 'yyyy-MM-dd HH:mm')"
+    }
+
+    git add -A
+    if (-not $?) { Die "git add failed." }
+
+    git commit -q -m $Message
+    if (-not $?) { Die "git commit failed." }
+    Good "Committed: $Message"
+
+    Say "Pushing (about 18 MiB, please wait)..."
+    git push -q origin main
+    if (-not $?) { Die "git push failed. Check your internet connection, then run this again." }
+    Good "Pushed to GitHub"
+
+    $sizeLine = git count-objects -vH | Select-String '^size-pack:'
+    if ($null -ne $sizeLine) {
+        $repoSize = ($sizeLine -split ':')[1].Trim()
+        $revs = (git rev-list --count HEAD)
+        Say ""
+        Say "Repository: $repoSize across $revs revisions"
+        $packMiB = [math]::Round(((Get-ChildItem "$RepoDir\.git" -Recurse -File -ErrorAction SilentlyContinue |
+                    Measure-Object -Property Length -Sum).Sum / 1MB), 0)
+        if ($packMiB -gt 700) {
+            Warn "Approaching GitHub's recommended 1 GB limit. Ask about squashing old revisions."
+        }
+    }
+}
+finally { Pop-Location }
+
+Say ""
+Say "=== Done ==="
+Say ""
+Say "GitHub Pages rebuilds in about a minute. Then it is live at:"
+Say "  $LiveUrl"
+Say ""
+Say "Note: browsers cache the page for up to 10 minutes. If you still see the old"
+Say "version, press Ctrl+Shift+R to force a reload."
+Say ""
