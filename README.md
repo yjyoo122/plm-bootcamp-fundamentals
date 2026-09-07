@@ -1,5 +1,9 @@
 # PLM Bootcamp — Fundamentals
 
+[![Version](https://img.shields.io/github/v/release/yjyoo122/plm-bootcamp-fundamentals?label=version&labelColor=1a1a1a&color=0696D7)](https://github.com/yjyoo122/plm-bootcamp-fundamentals/releases/latest)
+[![Last updated](https://img.shields.io/github/release-date/yjyoo122/plm-bootcamp-fundamentals?label=last%20updated&labelColor=1a1a1a&color=0696D7)](https://github.com/yjyoo122/plm-bootcamp-fundamentals/releases)
+[![Changelog](https://img.shields.io/badge/changelog-all%20versions-0696D7?labelColor=1a1a1a)](CHANGELOG.md)
+
 An interactive training deck for Autodesk **Fusion Manage** (PLM), built to be run live in front of a room or read on your own.
 
 ## ▶ Open the training
@@ -7,6 +11,19 @@ An interactive training deck for Autodesk **Fusion Manage** (PLM), built to be r
 ### **https://yjyoo122.github.io/plm-bootcamp-fundamentals/**
 
 That's it. No install, no login, no download. Click the link and it runs in your browser.
+
+---
+
+## Version
+
+**This is Version 3.** The badge above always shows what is live right now — it reads straight from the latest release, so it can't go stale.
+
+- **What changed, version by version** → **[CHANGELOG.md](CHANGELOG.md)**
+- **Every release, with dates** → **[Releases](https://github.com/yjyoo122/plm-bootcamp-fundamentals/releases)**
+
+Already opened this before? Check the badge against the version you last ran. If it's higher, the deck has been updated — hard-reload with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> to get the new one.
+
+The version goes up whenever the deck itself is republished. README or facilitator-guide edits don't bump it.
 
 ---
 
@@ -165,13 +182,41 @@ The script copies the file over `index.html`, re-applies the "PLM Bootcamp - Fun
 
 **Why not just copy the file yourself:** a fresh export from source carries the original `PLM Technical Bootcamp` title. The script re-applies the current title on every publish so it can't silently revert. To change the title permanently, edit the two lines near the top of `publish.ps1`.
 
+The script also handles the **version**, so you never have to think about it:
+
+1. reads `VERSION` (currently `3`) and bumps it to `4`
+2. adds a `## Version 4` entry to `CHANGELOG.md`
+3. tags the commit `v4` and publishes a **GitHub release** titled *Version 4*
+
+The README badge picks the new number up automatically — nothing else to edit.
+
+Give the release a real description instead of a timestamp:
+
+```powershell
+.\publish.ps1 -Notes "Rewrote the Quality chapter; new screenshots throughout"
+```
+
+That one line becomes the commit subject, the changelog entry, and the release notes.
+
+| Switch | Effect |
+|---|---|
+| `-Notes "..."` | Text for the changelog entry and release notes. Use it. |
+| `-NoBump` | Publish without raising the version (typo fix in an already-released deck) |
+| `-NoRelease` | Bump and tag, but skip creating the GitHub release page |
+
+Releases need the [GitHub CLI](https://cli.github.com/) (`gh`) signed in. Without it the script still bumps, tags and pushes — it just prints a link for creating the release by hand.
+
 **Manually, if you prefer git:**
 
 ```bash
 cd plm-bootcamp-fundamentals
 # replace index.html with the new build
-git commit -am "Update bootcamp deck"
-git push
+echo 4 > VERSION            # bump it
+# add a "## Version 4" entry to CHANGELOG.md
+git commit -am "Version 4 - what changed"
+git tag -a v4 -m "Version 4"
+git push && git push origin v4
+gh release create v4 --title "Version 4" --notes "what changed"
 ```
 
 **Or with no tools at all:** on the repo page, open `index.html` → pencil icon → delete-and-upload, or drag the new file into the repo. Works only while the deck stays **under 25 MiB** — that's GitHub's browser upload limit, and the deck is currently 17.5 MiB.
